@@ -36,6 +36,8 @@ rm -f $(ls &plugin;/&name;*.txz 2>/dev/null|grep -v '&version;')
 <FILE Name="&emhttp;/README.md">
 <INLINE>
 
+### hp-flash
+
 This package provide `hp-flash` and `hp-repsetup` cmdline tools.
 
 `hp-flash` can be used to update a system's BIOS.
@@ -56,6 +58,10 @@ KERNEL_V="$(uname -r)"
 DL_URL="https://github.com/&author;/unraid-&name;/releases/download/&version;/&driverName;-${KERNEL_V}-&version;"
 
 download() {
+  echo "-----------------Downloading &name; Module Drivers----------------"
+
+  mkdir -p "&packages;"
+
   # Download Module Drivers
   if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/&driverName;-${KERNEL_V}-&version;.tgz" "${DL_URL}.tgz" ; then
     wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/&driverName;-${KERNEL_V}-&version;.tgz.md5" "${DL_URL}.tgz.md5"
@@ -78,7 +84,7 @@ download() {
 check() {
   if [ ! -f "&packages;/&driverName;-${KERNEL_V}-&version;.tgz" ]; then
     echo
-    echo "-----Can't get found &driverName; driver version ${KERNEL_V}-&version; for this Unraid version!-----"
+    echo "-----Can't found &driverName; driver version ${KERNEL_V}-&version; for this Unraid version!-----"
     echo
     download
   else
