@@ -41,3 +41,7 @@ Usage: hp-repsetup [-g -s -q -a -h -?] [-p admin_password] [filename]
             filename            - Optional Name Of File To Save Settings To
                                   Or Restore Settings From (Default is HPSETUP.TXT)
 ```
+
+## REF
+
+[HP Flash and Replicated Setup Utilities for Linux](https://ftp.hp.com/pub/caps-softpaq/cmit/linuxtools/HP_LinuxTools.html)
