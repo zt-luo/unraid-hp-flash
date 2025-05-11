@@ -13,7 +13,7 @@
   <!ENTITY supportURL   "https://github.com/&author;/unraid-&name;/">
 ]>
 
-<PLUGIN name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="7.0.0" support="&supportURL;" icon="lock">
+<PLUGIN name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="7.0.0" support="&supportURL;" icon="code">
 
 <CHANGES>
 
@@ -36,39 +36,15 @@ rm -f $(ls &plugin;/&name;*.txz 2>/dev/null|grep -v '&version;')
 <FILE Name="&emhttp;/README.md">
 <INLINE>
 
-## Usage
+This package provide `hp-flash` and `hp-repsetup` cmdline tools.
 
-```shell
-Usage: hp-flash [-q -y -h -?] [-p admin_password] [-i] filename
-            -q  (Quiet Mode)    - Minimize text output
-            -y  (Yes Mode)      - Answer Yes to everything (non-interactive)
-            -h, -?              - Show this help message
-            -p admin_password   - Input BIOS Admin Password
-            -cspwdfile pwdfile  - Input Current BIOS Setup Password File
-            -i filename|delete  - Flash (or delete) a custom startup logo image
-            filename            - ROM binary or image file to flash
+`hp-flash` can be used to update a system's BIOS.
+Attention: The flashed BIOS image is not checked for validity.
+Only flash the system BIOS with BIN file from the HP support website.
 
-To suppress confirmation prompts (for non-interactive deployments), use the -y switch.
-```
-
-```shell
-Usage: hp-repsetup [-g -s -q -a -h -?] [-p admin_password] [filename]
-            -g  (Get Mode)      - Get BIOS settings
-            -s  (Set Mode)      - Set BIOS Settings
-            -q  (Quiet Mode)    - Minimize text output (default: Verbose Mode)
-            -a  (ASCII Mode)    - Create file in ASCII format (default: Unicode UCS-2)*
-                                  *Note: ASCII file cannot be imported with other tools
-            -h, -?              - Show this help message
-            -p admin_password   - Input Current BIOS Setup Password
-            -n admin_password   - Input New BIOS Setup Password
-            -n /                - Clears the BIOS Setup Password if the current
-                                  password is supplied with -p or -cspwdfile
-                                  option
-            -cspwdfile pwdfile  - Input Current BIOS Setup Password File
-            -nspwdfile pwdfile  - Input New BIOS Setup Password File
-            filename            - Optional Name Of File To Save Settings To
-                                  Or Restore Settings From (Default is HPSETUP.TXT)
-```
+`hp-repsetup` replicated setup (repset) supports limited functionality to
+clone UEFI BIOS Settings in an enterprise environment of HP systems of
+the same type running Linux.
 
 </INLINE>
 </FILE>
@@ -100,7 +76,7 @@ download() {
 }
 
 check() {
-  if [ -z "&packages;/&driverName;-${KERNEL_V}-&version;.tgz" ]; then
+  if [ ! -f "&packages;/&driverName;-${KERNEL_V}-&version;.tgz" ]; then
     echo
     echo "-----Can't get found &driverName; driver version ${KERNEL_V}-&version; for this Unraid version!-----"
     echo
