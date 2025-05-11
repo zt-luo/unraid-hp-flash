@@ -1,17 +1,19 @@
 <?xml version='1.0' standalone='yes'?>
 <!DOCTYPE PLUGIN [
   <!ENTITY name         "hp-flash">
-  <!ENTITY author       "ztluo">
+  <!ENTITY driverName   "hpuefi-mod">
+  <!ENTITY author       "zt-luo">
   <!ENTITY version      "2025.05.10">
   <!ENTITY gitURL       "https://raw.githubusercontent.com/&author;/unraid-&name;/master">
   <!ENTITY pluginURL    "&gitURL;/&name;.plg">
-  <!ENTITY md5          "b92c92bf1c055dd9c8767e323b9e4a7a">
+  <!ENTITY md5          "cb05d104d418f8071334a6bf4d86843e">
   <!ENTITY plugin       "/boot/config/plugins/&name;">
+  <!ENTITY packages     "/boot/config/plugins/&name;/packages">
   <!ENTITY emhttp       "/usr/local/emhttp/plugins/&name;">
-  <!ENTITY supportURL   "https://github.com/&author;/unraid-&namee;/">
+  <!ENTITY supportURL   "https://github.com/&author;/unraid-&name;/">
 ]>
 
-<PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0" support="&supportURL;" icon="lock">
+<PLUGIN name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="7.0.0" support="&supportURL;" icon="lock">
 
 <CHANGES>
 
@@ -27,7 +29,7 @@ rm -f $(ls &plugin;/&name;*.txz 2>/dev/null|grep -v '&version;')
 </FILE>
 
 <FILE Name="&plugin;/&name;-&version;.tgz" Run="upgradepkg --install-new">
-<URL>&gitURL;/packages/&name;-&version;.tgz</URL>
+<URL>https://github.com/&author;/unraid-&name;/releases/download/&version;/&name;-&version;.tgz</URL>
 <MD5>&md5;</MD5>
 </FILE>
 
@@ -74,6 +76,58 @@ Usage: hp-repsetup [-g -s -q -a -h -?] [-p admin_password] [filename]
 <FILE Run="/bin/bash">
 <INLINE>
 
+KERNEL_V="$(uname -r)"
+DL_URL="https://github.com/&author;/unraid-&name;/releases/download/&version;/&driverName;-${KERNEL_V}-&version;"
+
+download() {
+  # Download Module Drivers
+  if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/&driverName;-${KERNEL_V}-&version;.tgz" "${DL_URL}.tgz" ; then
+    wget -q -nc --show-progress --progress=bar:force:noscroll -O "&packages;/&driverName;-${KERNEL_V}-&version;.tgz.md5" "${DL_URL}.tgz.md5"
+    if [ "$(md5sum &packages;/&driverName;-${KERNEL_V}-&version;.tgz | awk '{print $1}')" != "$(cat &packages;/&driverName;-${KERNEL_V}-&version;.tgz.md5 | awk '{print $1}')" ]; then
+      echo
+      echo "---CHECKSUM ERROR!---"
+      rm -rf &plugin; &emhttp;
+      exit 1
+    fi
+    echo
+    echo "----------Successfully downloaded &name; Module Drivers----------"
+  else
+    echo
+    echo "---------------Can't download &name; Module Drivers--------------"
+    rm -rf &plugin; &emhttp;
+    exit 1
+  fi
+}
+
+check() {
+  if [ -z "&packages;/&driverName;-${KERNEL_V}-&version;.tgz" ]; then
+    echo
+    echo "-----Can't get found &driverName; driver version ${KERNEL_V}-&version; for this Unraid version!-----"
+    echo
+    download
+  else
+    echo
+    echo "---------------&driverName; Module Drivers locally found---------------"
+    echo
+  fi
+}
+
+install() {
+# Install Module Drivers
+/sbin/installpkg "&packages;/&driverName;-${KERNEL_V}-&version;.tgz"
+depmod -a
+}
+
+#Check for old packages
+rm -rf $(ls -d &packages;/* | grep -v "${KERNEL_V}")
+
+#Check if version matches
+check
+
+install
+
+echo
+echo "--------Installation of &driverName; Module Drivers successful---------"
 echo
 
 </INLINE>
@@ -82,11 +136,15 @@ echo
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
 
+KERNEL_V="$(uname -r)"
+
 echo "------------------------------"
 echo "-----Uninstalling hp-flash----"
 echo "------------------------------"
 # Remove plugin related files
-removepkg &name;-&version;.tgz
+removepkg &name;-&version;
+removepkg &driverName;-${KERNEL_V}-&version;
+rm -rf &emhttp;
 rm -rf &plugin;
 echo
 echo "----------------------------------------------------------"

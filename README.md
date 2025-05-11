@@ -2,7 +2,7 @@
 
 This is the repository for the hp-flash plugin.
 
-Support: https://github.com/ztluo/unraid-hp-flash/
+Support: https://github.com/zt-luo/unraid-hp-flash/
 
 ## Usage
 
