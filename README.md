@@ -4,6 +4,10 @@ This is the repository for the hp-flash plugin.
 
 Support: https://github.com/zt-luo/unraid-hp-flash/
 
+## Install
+
+Use this url to install plugin: https://raw.githubusercontent.com/zt-luo/unraid-hp-flash/main/hp-flash.plg
+
 ## Usage
 
 ```shell
